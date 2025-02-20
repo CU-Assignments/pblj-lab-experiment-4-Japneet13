@@ -1,81 +1,132 @@
-Experiment 4.2: Card Collection System
+import java.util.*;
 
-Objective:
-Develop a Java program that collects and stores playing cards to help users find all the cards of a given symbol (suit).
-The program should utilize the Collection interface (such as ArrayList, HashSet, or HashMap) to manage the card data efficiently.
+class Card {
+    String suit;
+    String rank;
 
-Understanding the Problem Statement
+    public Card(String suit, String rank) {
+        this.suit = suit;
+        this.rank = rank;
+    }
 
-1. Card Structure:
-Each card consists of a symbol (suit) and a value (rank).
+    @Override
+    public String toString() {
+        return rank + " of " + suit;
+    }
 
-Example card representations:
-Ace of Spades
-King of Hearts
-10 of Diamonds
-5 of Clubs
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Card card = (Card) obj;
+        return Objects.equals(suit, card.suit) && Objects.equals(rank, card.rank);
+    }
 
-2. Operations Required:
-Add Cards → Store card details in a collection.
-Find Cards by Symbol (Suit) → Retrieve all cards belonging to a specific suit (e.g., all "Hearts").
-Display All Cards → Show all stored cards.
+    @Override
+    public int hashCode() {
+        return Objects.hash(suit, rank);
+    }
+}
 
-3. Collections Usage:
-ArrayList: To store cards in an ordered manner.
-HashSet: To prevent duplicate cards.
-HashMap<String, List<Card>>: To organize cards based on suits for faster lookup.
+class CardCollectionSystem {
+    private final Map<String, Set<Card>> cardCollection = new HashMap<>();
 
+    public void addCard(String suit, String rank) {
+        cardCollection.putIfAbsent(suit, new HashSet<>());
+        Card newCard = new Card(suit, rank);
+        if (!cardCollection.get(suit).add(newCard)) {
+            System.out.println("Error: Card \"" + newCard + "\" already exists.");
+        } else {
+            System.out.println("Card added: " + newCard);
+        }
+    }
 
-Test Cases
+    public void findCardsBySuit(String suit) {
+        if (cardCollection.containsKey(suit) && !cardCollection.get(suit).isEmpty()) {
+            for (Card card : cardCollection.get(suit)) {
+                System.out.println(card);
+            }
+        } else {
+            System.out.println("No cards found for " + suit + ".");
+        }
+    }
 
-Test Case 1: No Cards Initially
-Input:
-Display All Cards
-Expected Output:
-No cards found.
+    public void displayAllCards() {
+        if (cardCollection.isEmpty()) {
+            System.out.println("No cards found.");
+            return;
+        }
+        for (Set<Card> cards : cardCollection.values()) {
+            for (Card card : cards) {
+                System.out.println(card);
+            }
+        }
+    }
 
-Test Case 2: Adding Cards
-Input:
-Add Card: Ace of Spades
-Add Card: King of Hearts
-Add Card: 10 of Diamonds
-Add Card: 5 of Clubs
-Expected Output:
-Card added: Ace of Spades
-Card added: King of Hearts
-Card added: 10 of Diamonds
-Card added: 5 of Clubs
+    public void removeCard(String suit, String rank) {
+        if (cardCollection.containsKey(suit)) {
+            Card cardToRemove = new Card(suit, rank);
+            if (cardCollection.get(suit).remove(cardToRemove)) {
+                System.out.println("Card removed: " + cardToRemove);
+                if (cardCollection.get(suit).isEmpty()) {
+                    cardCollection.remove(suit);
+                }
+            } else {
+                System.out.println("Error: Card \"" + cardToRemove + "\" not found.");
+            }
+        } else {
+            System.out.println("Error: No cards of suit " + suit + " found.");
+        }
+    }
+}
 
-Test Case 3: Finding Cards by Suit
-Input:
-Find All Cards of Suit: Hearts
-Expected Output:
-King of Hearts
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        CardCollectionSystem ccs = new CardCollectionSystem();
 
-Test Case 4: Searching Suit with No Cards
-Input:
-Find All Cards of Suit: Diamonds
-(If no Diamonds were added)
-Expected Output:
-No cards found for Diamonds.
+        while (true) {
+            System.out.println("\nCard Collection System");
+            System.out.println("1. Add Card");
+            System.out.println("2. Find Cards by Suit");
+            System.out.println("3. Display All Cards");
+            System.out.println("4. Remove Card");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
 
-Test Case 5: Displaying All Cards
-Input:
-Display All Cards
-Expected Output:
-Ace of Spades
-King of Hearts
-10 of Diamonds
-5 of Clubs
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
 
-Test Case 6: Preventing Duplicate Cards
-Input:
-Add Card: King of Hearts
-Expected Output:
-Error: Card "King of Hearts" already exists.
-
-Test Case 7: Removing a Card
-Input:
-Remove Card: 10 of Diamonds
-Expected Output:
-Card removed: 10 of Diamonds
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter Suit: ");
+                    String suit = scanner.nextLine();
+                    System.out.print("Enter Rank: ");
+                    String rank = scanner.nextLine();
+                    ccs.addCard(suit, rank);
+                    break;
+                case 2:
+                    System.out.print("Enter Suit to Search: ");
+                    String searchSuit = scanner.nextLine();
+                    ccs.findCardsBySuit(searchSuit);
+                    break;
+                case 3:
+                    ccs.displayAllCards();
+                    break;
+                case 4:
+                    System.out.print("Enter Suit of Card to Remove: ");
+                    String removeSuit = scanner.nextLine();
+                    System.out.print("Enter Rank of Card to Remove: ");
+                    String removeRank = scanner.nextLine();
+                    ccs.removeCard(removeSuit, removeRank);
+                    break;
+                case 5:
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}

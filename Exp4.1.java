@@ -1,60 +1,129 @@
-Experiment 4.1: Employee Management System
+import java.util.ArrayList;
+import java.util.Scanner;
 
-The Employee Management System is a simple Java-based application that uses ArrayList to manage employee records. The system allows users to perform the following operations:
+class Employee {
+    int id;
+    String name;
+    double salary;
 
-Add Employee → Store Employee ID, Name, and Salary.
+    public Employee(int id, String name, double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+    }
+}
 
-Update Employee → Modify employee details based on their ID.
+class EmployeeManagementSystem {
+    private final ArrayList<Employee> employees = new ArrayList<>();
 
-Remove Employee → Delete an employee using their ID.
+    public void addEmployee(int id, String name, double salary) {
+        for (Employee emp : employees) {
+            if (emp.id == id) {
+                System.out.println("Error: Employee with ID " + id + " already exists.");
+                return;
+            }
+        }
+        employees.add(new Employee(id, name, salary));
+        System.out.println("Employee Added: ID=" + id + ", Name=" + name + ", Salary=" + salary);
+    }
 
-Search Employee → Find employees by ID or Name.
+    public void updateEmployee(int id, double newSalary) {
+        for (Employee emp : employees) {
+            if (emp.id == id) {
+                emp.salary = newSalary;
+                System.out.println("Employee ID " + id + " updated successfully.");
+                return;
+            }
+        }
+        System.out.println("Error: Employee ID " + id + " not found.");
+    }
 
-Display All Employees → Show a complete list of employees.
+    public void removeEmployee(int id) {
+        for (Employee emp : employees) {
+            if (emp.id == id) {
+                employees.remove(emp);
+                System.out.println("Employee ID " + id + " removed successfully.");
+                return;
+            }
+        }
+        System.out.println("Error: Employee ID " + id + " not found.");
+    }
 
-Test Cases
+    public void searchEmployee(int id) {
+        for (Employee emp : employees) {
+            if (emp.id == id) {
+                System.out.println("Employee Found: ID=" + emp.id + ", Name=" + emp.name + ", Salary=" + emp.salary);
+                return;
+            }
+        }
+        System.out.println("Error: Employee ID " + id + " not found.");
+    }
 
-Test Case 1: Adding Employees (No Employees Initially)
-Display Employees
-Expected Output:
-No employees found.
-  
-Test Case 2: Add Employees
-Input:
-Add Employee (ID=101, Name="Anish", Salary=50000)
-Add Employee (ID=102, Name="Bobby", Salary=60000)
-Expected Output:
-Employee Added: ID=101, Name=Anish, Salary=50000
-Employee Added: ID=102, Name=Bobby, Salary=60000
+    public void displayEmployees() {
+        if (employees.isEmpty()) {
+            System.out.println("No employees found.");
+        } else {
+            for (Employee emp : employees) {
+                System.out.println("ID: " + emp.id + ", Name: " + emp.name + ", Salary: " + emp.salary);
+            }
+        }
+    }
+}
 
-Test Case 3: Update Employee Salary
-Input:
-Update Employee (ID=101, New Salary=55000)
-Expected Output:
-Employee ID 101 updated successfully.
-
-Test Case 4: Search Employee by ID
-Input:
-Search Employee by ID=102
-Expected Output:
-Employee Found: ID=102, Name=Bobby, Salary=60000
-
-Test Case 5: Remove Employee
-Input:
-Remove Employee (ID=101)
-Expected Output:
-Employee ID 101 removed successfully.
-
-Test Case 6: Display All Employees
-Input:
-Display Employees
-Expected Output:
-ID: 102, Name: Bobby, Salary: 60000
-
-Test Case 7: Adding Duplicate Employee ID
-Input:
-Add Employee (ID=101, Name="Charlie", Salary=70000)
-Expected Output:
-Error: Employee with ID 101 already exists.
-
-
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        EmployeeManagementSystem ems = new EmployeeManagementSystem();
+        
+        while (true) {
+            System.out.println("\nEmployee Management System");
+            System.out.println("1. Add Employee");
+            System.out.println("2. Update Employee");
+            System.out.println("3. Remove Employee");
+            System.out.println("4. Search Employee");
+            System.out.println("5. Display All Employees");
+            System.out.println("6. Exit");
+            System.out.print("Enter your choice: ");
+            
+            int choice = scanner.nextInt();
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter ID: ");
+                    int id = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline
+                    System.out.print("Enter Name: ");
+                    String name = scanner.nextLine();
+                    System.out.print("Enter Salary: ");
+                    double salary = scanner.nextDouble();
+                    ems.addEmployee(id, name, salary);
+                    break;
+                case 2:
+                    System.out.print("Enter Employee ID: ");
+                    int updateId = scanner.nextInt();
+                    System.out.print("Enter New Salary: ");
+                    double newSalary = scanner.nextDouble();
+                    ems.updateEmployee(updateId, newSalary);
+                    break;
+                case 3:
+                    System.out.print("Enter Employee ID to Remove: ");
+                    int removeId = scanner.nextInt();
+                    ems.removeEmployee(removeId);
+                    break;
+                case 4:
+                    System.out.print("Enter Employee ID to Search: ");
+                    int searchId = scanner.nextInt();
+                    ems.searchEmployee(searchId);
+                    break;
+                case 5:
+                    ems.displayEmployees();
+                    break;
+                case 6:
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}
